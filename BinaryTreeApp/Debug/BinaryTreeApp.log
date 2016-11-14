@@ -1,0 +1,4 @@
+﻿  TestHarness.cpp
+c:\users\steven\documents\visual studio 2010\projects\binarytreeapp\binarytreeapp\binarytree.h(191): warning C4715: 'BinaryTree<int>::BTFindFurthestNode' : not all control paths return a value
+TestHarness.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
+  BinaryTreeApp.vcxproj -> C:\Users\Steven\Documents\Visual Studio 2010\Projects\BinaryTreeApp\Debug\BinaryTreeApp.exe
