@@ -23,4 +23,11 @@ public:
 		right = NULL;
 		parent = NULL;
 	}
+
+	//destructor
+	~Node()
+	{
+
+	}
+
 };

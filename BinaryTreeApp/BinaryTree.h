@@ -60,48 +60,6 @@ private:
 		return NULL;
 	}
 
-	Node<T>* BTDelete(Node<T>* head, T remove)
-	{
-		//Can't search if there's no tree to search
-		if (head == NULL)
-		{
-			return NULL;
-		}
-		//We've found the node that should be removed
-		else if (head->m_value == remove)
-		{
-			//If there's no left node, return the right node.  This will replace what we're deleting
-			if (head->left == NULL)
-			{
-				return head->right;
-			}
-			//if there's no right node, return the left node.  This will replace what we're deleting
-			else if (head->right == NULL)
-			{
-				return head->left;
-			}
-			//Case where there are two children we find the right most node under the left branch
-			else
-			{
-				head->left = findRightmostNodeToSwap(head->left, head);
-				return head;
-			}
-		}
-		else
-		{
-			//Not at the node we want to delete yet, keep traversing the tree
-			//if the value we want to remove is smaller than the value we're currently at, go left
-			if (remove < head->m_value)
-			{
-				head->left = BTDelete(head->left, remove);
-			}
-			else	//otherwise go right
-			{
-				head->right = BTDelete(head->right, remove);
-			}
-		}
-	}
-
 	// Finds the rightmost node on the left branch to swap, swaps the value
 	// Used when two children exist for a node that we want to delete
 	Node<T>* findRightmostNodeToSwap(Node<T>* head, Node<T>* remove)
@@ -191,7 +149,7 @@ private:
 	}
 
 	//Removes a deleted node from memory, updates size and head node if necessary
-	void BTRemoveNodeFromMemory(Node<T>* delNode)
+	void BTDelete(Node<T>* delNode)
 	{
 		if (delNode == m_head)
 		{
@@ -212,6 +170,22 @@ private:
 
 		delete delNode;
 		m_size--;
+	}
+
+	//Traverse the binary tree and execute the supplied function at each node
+	void BTTraverse(Node<T>* node, void (*function)(T) )
+	{
+		if (node != NULL)
+		{
+			BTTraverse(node->left, function);
+			//Execute supplied function for node
+			function(node->m_value);
+			BTTraverse(node->right, function);
+		}
+		else
+		{
+			return;
+		}
 	}
 
 public:
@@ -238,6 +212,16 @@ public:
 		//initialize the head node to the value passed in
 		m_head = new Node<T>(initVal);
 		m_size++;
+	}
+
+	//destructor - deletes all nodes starting from the smallest
+	~BinaryTree()
+	{
+		while (m_size > 0)
+		{
+			Node<T>* delNode = BTFindFurthestNode(m_head, false);
+			BTDelete(delNode);
+		}
 	}
 
 	//Looks for a value in the binary tree
@@ -311,7 +295,7 @@ public:
 				BTUnlinkParent(nodeToDelete);
 
 				//delete Node
-				BTRemoveNodeFromMemory(nodeToDelete);
+				BTDelete(nodeToDelete);
 			}
 		
 			//case where there's only one child - relink child and delete
@@ -334,7 +318,7 @@ public:
 				BTLinkToParent(childToRelink, nodeToDelete);
 
 				//Delete node
-				BTRemoveNodeFromMemory(nodeToDelete);
+				BTDelete(nodeToDelete);
 			}
 
 			//case where there are two children
@@ -349,35 +333,16 @@ public:
 				BTLinkToParent(swapNode->right, swapNode);
 				
 				//delete Node
-				BTRemoveNodeFromMemory(swapNode);
+				BTDelete(swapNode);
 			}
 		}
 
 		return false;
 	}
 
-	void TraverseandPrint()
+	void ExecuteForEachNode(void (*function)(T) )
 	{
-		Traverse(m_head);
-	}
-
-	void Traverse(Node<T>* node)
-	{
-		if (node != NULL)
-		{
-			Traverse(node->left);
-			Print(node->m_value);
-			Traverse(node->right);
-		}
-		else
-		{
-			return;
-		}
-	}
-
-	void Print(const T& printMe)
-	{
-		std::cout<<" "<<printMe;
+		BTTraverse(m_head, function);
 	}
 
 	int GetSize()
