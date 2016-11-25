@@ -10,12 +10,6 @@ public:
 	Node* parent;
 
 	//constructor
-	Node()
-	{
-		left = NULL;
-		right = NULL;
-		parent = NULL;
-	}
 	Node(T initVal)
 	{
 		m_value = initVal;
