@@ -22,15 +22,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	int midVal;
 
 	//create a new binary tree on the stack
-	BinaryTree<int> testTree(newVal);
+	BinaryTree<int> testTree;
 	std::cout<<"Creating binary tree with: "<<newVal<<std::endl;
 
-	//fill binary tree with 100 random numbers
+	//fill binary tree with 10 random numbers
 	for (int i = 0; i<100; i++)
 	{
 		newVal = rand()%100;
 		testTree.Insert( newVal );
-		std::cout<<"Adding: "<<newVal<<std::endl;
 		
 		//Randomly select a value in the middle for use later
 		if (i == 50)
@@ -39,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}
 
-	//Size should be 101 at this point
+	//Size should be 10 at this point
 	std::cout<<"Tree currently has "<<testTree.GetSize()<<"Nodes"<<std::endl<<std::endl;
 	std::cout<<"Head of tree is  "<<testTree.GetHead()<<std::endl;
 	std::cout<<"Biggest Node: "<<testTree.GetBiggest()<<"  Smallest Node: "<<testTree.GetSmallest()<<std::endl;
@@ -101,6 +100,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		testTree.Delete( delVal );
 		std::cout<<"Deleting: "<<delVal<<std::endl;
 	}
+	system("pause");
 
 	//Size should be 0 at this point
 	std::cout<<"Tree currently has "<<testTree.GetSize()<<"Nodes"<<std::endl;
@@ -110,6 +110,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	std::cout<<"Biggest Node: "<<testTree.GetBiggest()<<"  Smallest Node: "<<testTree.GetSmallest()<<std::endl;
 
+	std::cout<<"Inserting 1 "<<std::endl;
 	testTree.Insert(1);
 	std::cout<<"Tree currently has "<<testTree.GetSize()<<"Nodes"<<std::endl;
 	std::cout<<"BST: ";
@@ -117,6 +118,69 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::cout<<std::endl;
 
 	std::cout<<"Biggest Node: "<<testTree.GetBiggest()<<"  Smallest Node: "<<testTree.GetSmallest()<<std::endl;
+
+	system("pause");
+
+
+	//Create a new binary tree
+	BinaryTree<int> testTree2(rand()%100);
+
+	//fill a both binary trees with 50 more random numbers
+	for (int i = 0; i<50; i++)
+	{
+		testTree2.Insert( rand()%100 );
+
+		testTree.Insert( rand()%100 );
+	}
+
+	std::cout<<"TestTree currently has "<<testTree.GetSize()<<"Nodes"<<std::endl;
+	std::cout<<"TestTree: ";
+	testTree.ExecuteForEachNode(printFP);
+	std::cout<<std::endl;
+
+	std::cout<<"TestTree2 currently has "<<testTree2.GetSize()<<"Nodes"<<std::endl;
+	std::cout<<"TestTree2:";
+	testTree2.ExecuteForEachNode(printFP);
+	std::cout<<std::endl;
+	system("pause");
+
+
+
+	//Copy constructor testing
+	BinaryTree<int> testTree3(testTree);
+
+	std::cout<<"TestTree3 created via copyConstructor has: "<<testTree3.GetSize()<<"Nodes"<<std::endl;
+	std::cout<<"TestTree3:";
+	testTree3.ExecuteForEachNode(printFP);
+	std::cout<<std::endl;
+	system("pause");
+
+	//assignment operator testing
+	testTree3 = testTree2;
+
+	std::cout<<"TestTree3 = TestTree2 has: "<<testTree3.GetSize()<<"Nodes"<<std::endl;
+	std::cout<<"TestTree3:";
+	testTree3.ExecuteForEachNode(printFP);
+	std::cout<<std::endl;
+	system("pause");
+
+	//Adding binary trees together
+	testTree = testTree + testTree2;
+
+	std::cout<<"TestTree added to TestTree2 has: "<<testTree.GetSize()<<"Nodes"<<std::endl;
+	std::cout<<"TestTree: ";
+	testTree.ExecuteForEachNode(printFP);
+	std::cout<<std::endl;
+	system("pause");
+
+
+
+
+
+	//Disable multiply, divide, subtract
+
+
+
 
 	system("pause");
 

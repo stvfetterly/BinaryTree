@@ -1,5 +1,5 @@
 ﻿  TestHarness.cpp
 c:\users\steven\documents\github\binarytree\binarytreeapp\testharness.cpp(20): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\steven\documents\github\binarytree\binarytreeapp\binarytree.h(149): warning C4715: 'BinaryTree<int>::BTFindFurthestNode' : not all control paths return a value
+c:\users\steven\documents\github\binarytree\binarytreeapp\binarytree.h(148): warning C4715: 'BinaryTree<int>::BTFindFurthestNode' : not all control paths return a value
 TestHarness.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
   BinaryTreeApp.vcxproj -> C:\Users\Steven\Documents\GitHub\BinaryTree\Debug\BinaryTreeApp.exe

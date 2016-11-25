@@ -7,21 +7,20 @@ class BinaryTree
 {
 private:
 	Node<T>* m_head;
-
-	static int m_size;
+	int m_size;
 
 	//creates a new Node, recursively loops through and adds it in
-	Node<T>* BTInsert(Node<T>* m_head, T newVal)
+	Node<T>* BTInsert(Node<T>* m_head, const T& newVal)
 	{
-		Node<T>* newNode = new Node<T>(newVal);
-
 		//if no head node has been created yet, create one
 		if (m_head == NULL)
 		{
+			//FOR DEBUG - std::cout<<"CREATING:"<<newVal<<" in "<<this->m_head<<std::endl;
+			Node<T>* newNode = new Node<T>(newVal);;
 			m_head = newNode;
 		}
 		//less than goes to left
-		else if ( newNode->m_value < m_head->m_value )
+		else if ( newVal < m_head->m_value )
 		{
 			m_head->left = BTInsert(m_head->left, newVal);
 			m_head->left->parent = m_head;
@@ -151,28 +150,43 @@ private:
 	//Removes a deleted node from memory, updates size and head node if necessary
 	void BTDelete(Node<T>* delNode)
 	{
-		if (delNode == m_head)
+		//FOR DEBUG - std::cout<<"DELETE:"<<delNode->m_value<<" in "<< m_head <<std::endl;
+
+		if (delNode == m_head)	//reassign the head and delete
 		{
 			//Set the parent to the left node if it exists
 			if (delNode->left != NULL)
 			{
 				m_head = delNode->left;
+				m_head->parent = NULL;
+				
+				delete delNode;
 			}
-			else if (delNode->right != NULL)	//Otherwise set parent to the right node
+			else if (delNode->right != NULL)
 			{
+				//Set parent to the right node if it exists and there's no left node
 				m_head = delNode->right;
+				m_head->parent = NULL;
+
+				delete delNode;
 			}
-			else	//if that was the only node in the tree, m_head doesn't exist
+			else	//if that was the only node in the tree, set it to NULL after deleting
 			{
+				delete delNode;
+
 				m_head = NULL;
 			}
 		}
+		else	//regular node deletion . . . just delete it
+		{
+			delete delNode;
+		}
 
-		delete delNode;
+		//always update size when we delete a node
 		m_size--;
 	}
 
-	//Traverse the binary tree and execute the supplied function at each node
+	//Traverse the whole binary tree and execute the supplied function at each node
 	void BTTraverse(Node<T>* node, void (*function)(T) )
 	{
 		if (node != NULL)
@@ -188,7 +202,103 @@ private:
 		}
 	}
 
+	//Starts at smallest, traverses through whole tree looking for index.  nodeCount should always be declared zero
+	Node<T>* BTTraverseInOrderTo(Node<T>* node, const int& index, int& nodeCount) const
+	{
+		Node<T>* returnMe = NULL;
+		if (index < GetSize() && index >= 0)
+		{
+			if (node != NULL)
+			{
+				returnMe = BTTraverseInOrderTo(node->left, index, nodeCount);
+				
+				//If we've already found the value, stop recursing and return it
+				if (returnMe != NULL)
+				{
+					return returnMe;
+				}
+				//If this is the value, return it
+				else if (nodeCount == index)
+				{
+					return node;
+				}
+				nodeCount++;
+
+				returnMe = BTTraverseInOrderTo(node->right, index, nodeCount);
+			}
+			else	//node we're examining is NULL
+			{
+				return returnMe;
+			}
+		}
+
+		return returnMe;
+	}
+
+	//Starts at head, traverses through whole tree looking for index.  nodeCount should always be declared zero
+	Node<T>* BTTraversePreOrderTo(Node<T>* node, const int& index, int& nodeCount) const
+	{
+		Node<T>* returnMe = NULL;
+		if (index < GetSize() && index >= 0)
+		{
+			if (node != NULL)
+			{
+				//If we've already found the value, stop recursing and return it
+				if (returnMe != NULL)
+				{
+					return returnMe;
+				}
+				//If this is the value, return it
+				else if (nodeCount == index)
+				{
+					return node;
+				}
+				nodeCount++;
+
+				returnMe = BTTraversePreOrderTo(node->left, index, nodeCount);
+
+				//if we've already found the value, stop recursing
+				if (returnMe == NULL)
+				{
+					returnMe = BTTraversePreOrderTo(node->right, index, nodeCount);
+				}
+			}
+			else	//node we're examining is NULL
+			{
+				return returnMe;
+			}
+		}
+
+		return returnMe;
+	}
+
+	//Creates a new node in current tree for each value stored in src
+	void BTCopyValuesFromTree(const BinaryTree& src)
+	{
+		//Copy each value from the src tree into the current tree
+		for (int i = 0; i < src.GetSize(); ++i)
+		{
+			T newVal = src.GetAt(i, PRE_ORDER);
+			Insert(newVal);
+		}
+	}
+
+	//Deletes all nodes in the tree
+	void BTDeleteAllNodes()
+	{
+		while (GetSize() > 0 && m_head != NULL)
+		{
+			//Find a node
+			Node<T>* delNode = BTFindFurthestNode(m_head, false);
+
+			//Delete
+			Delete(delNode->m_value);
+		}
+	}
+
 public:
+
+	enum traversalType {IN_ORDER, PRE_ORDER};
 
 	T GetHead()
 	{
@@ -202,26 +312,75 @@ public:
 		}
 	}
 
-	//constructor
-	BinaryTree()
+	//constructors
+	BinaryTree()						//default constructor, no nodes
 	{
 		m_head = NULL;
-	}
-	BinaryTree(T initVal)
+		m_size = 0;
+	}				
+	BinaryTree(T initVal)				//construct BT with first node
 	{
 		//initialize the head node to the value passed in
+		//FOR DEBUG - std::cout<<"CREATING:"<<initVal<<" in "<<this->m_head<<std::endl;
 		m_head = new Node<T>(initVal);
-		m_size++;
-	}
+		m_size = 1;
+	}		
+	BinaryTree (const BinaryTree& src)	//copy constructor
+	{
+		m_head = NULL;
+		m_size = 0;
 
+		BTCopyValuesFromTree(src);
+	}
 	//destructor - deletes all nodes starting from the smallest
 	~BinaryTree()
 	{
-		while (m_size > 0)
+		BTDeleteAllNodes();
+	}
+
+	//assignment operator
+	BinaryTree& operator=(const BinaryTree& rhs)
+	{
+		//ignore self assignments
+		if (this == &rhs)
 		{
-			Node<T>* delNode = BTFindFurthestNode(m_head, false);
-			BTDelete(delNode);
+			return (*this);
 		}
+
+		//delete old binary tree
+		BTDeleteAllNodes();
+
+		//create new binary tree
+		BTCopyValuesFromTree(rhs);
+
+		return *this;
+	}
+
+	//allow the addition of binary trees - add all nodes from rhs into lhs (this)
+	const BinaryTree operator+ (const BinaryTree& rhs)
+	{
+		//create a copy of the LHS in newTree
+		BTCopyValuesFromTree(rhs);
+
+		return *this;
+	}
+
+	//Get a particular value at the specified index
+	T GetAt(int index, const traversalType trvTyp) const
+	{
+		Node<T>* retNode = NULL;
+		int stupid = 0;
+
+		if (trvTyp == IN_ORDER)
+		{
+			retNode = BTTraverseInOrderTo(m_head, index, stupid);
+		}
+		else
+		{
+			retNode = BTTraversePreOrderTo(m_head, index, stupid);
+		}
+
+		return retNode->m_value;
 	}
 
 	//Looks for a value in the binary tree
@@ -281,7 +440,7 @@ public:
 	}
 
 	//User just provides a value to delete, returns true if it deleted properly
-	bool Delete(T delVal)
+	bool Delete(const T& delVal)
 	{
 		//Find nodeToDelete
 		Node<T>* nodeToDelete = BTSearch(m_head, delVal);
@@ -345,11 +504,8 @@ public:
 		BTTraverse(m_head, function);
 	}
 
-	int GetSize()
+	const int& GetSize() const
 	{
 		return m_size;
 	}
 };
-
-template <typename T>
-int BinaryTree<T>::m_size = 0;
